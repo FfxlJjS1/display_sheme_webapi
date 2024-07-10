@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Xml;
+using webapi.Kafka;
 
 namespace webapi.Controllers
 {
@@ -14,6 +15,7 @@ namespace webapi.Controllers
         private DbCollectionContext db;
         private bool is_injection_out_classification = true;
         private Dictionary<string, Dictionary<string, DownClassificationLevel[]>>? _injectionInOutClassification = null;
+        private KafkaClient kafka_client = new KafkaClient("localhost::9092", KafkaClient.KafkaClientType.Producer);
 
         private Dictionary<string, Dictionary<string, DownClassificationLevel[]>> InjectionInOutClassification
         {
@@ -381,6 +383,8 @@ namespace webapi.Controllers
                 node_edge_dictionary[top_classification_key] = sorted_objects.ToArray();
             }
 
+            kafka_client.SendMesssage(message: "Created");
+
             // Возрат результата
             return Ok(
                 (from s in new int[1]
@@ -601,6 +605,8 @@ namespace webapi.Controllers
                     $"Тип: {result.TipNpoName}",
                     $"Категория: {result.Category}\n",
                     $"Статус: {result.State}" };
+
+            kafka_client.SendMesssage(message: "Got");
 
             return Ok(
                 (from s in new int[1]
