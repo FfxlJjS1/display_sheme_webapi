@@ -15,7 +15,7 @@ namespace webapi.Controllers
         private DbCollectionContext db;
         private bool is_injection_out_classification = true;
         private Dictionary<string, Dictionary<string, DownClassificationLevel[]>>? _injectionInOutClassification = null;
-        private KafkaClient kafka_client = new KafkaClient("localhost::9092", KafkaClient.KafkaClientType.Producer);
+        private KafkaClient kafka_client = new KafkaClient("kafka:9092", KafkaClient.KafkaClientType.Producer);
 
         private Dictionary<string, Dictionary<string, DownClassificationLevel[]>> InjectionInOutClassification
         {
@@ -383,7 +383,7 @@ namespace webapi.Controllers
                 node_edge_dictionary[top_classification_key] = sorted_objects.ToArray();
             }
 
-            kafka_client.SendMesssage(message: "Created");
+            kafka_client.SendMesssage(message: "SchemeController: Created in 'GetInjectionOutTreeTable'");
 
             // Возрат результата
             return Ok(
@@ -555,6 +555,8 @@ namespace webapi.Controllers
                 node_edge_dictionary[top_classification_key] = sorted_objects.ToArray();
             }
 
+            kafka_client.SendMesssage(message: "SchemeController: Created in 'GetInjectionInTreeTable'");
+
             // Возрат результата
             return Ok(
                 (from s in new int[1]
@@ -606,7 +608,7 @@ namespace webapi.Controllers
                     $"Категория: {result.Category}\n",
                     $"Статус: {result.State}" };
 
-            kafka_client.SendMesssage(message: "Got");
+            kafka_client.SendMesssage(message: "SchemeController: Got object data with id '" + Convert.ToString(objectId) + "'");
 
             return Ok(
                 (from s in new int[1]
